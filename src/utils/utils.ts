@@ -9,11 +9,6 @@ import {
 
 import { SECURITY_CONTEXT_SECP256k1_RECOVERY_URL } from '../signature-suites'
 
-// export const generateSecp256k1KeyPair = async () => {
-//   const { privateKey, publicKeyBase58, address } = await EthereumDID.createKeyPair('testnet')
-//   return { privateKey, publicKeyBase58, address }
-// }
-
 export function getSecp256k1DidDocWithPublicKey(
   did: string,
   publicKeyBase58: string,

@@ -8,8 +8,6 @@ import {
 
 import { EthereumLedgerService } from '../ledger/EthereumLedgerService'
 
-// import { isValidEthereumDid } from './didEthrUtil'
-
 export class EthereumDidResolver implements DidResolver {
   public readonly allowsCaching = true
 
@@ -21,7 +19,6 @@ export class EthereumDidResolver implements DidResolver {
     // if (!isValidEthereumDid(did)) {
     //   throw new Error('Invalid DID')
     // }
-
     try {
       const { didDocument, didDocumentMetadata, didResolutionMetadata } = await ethereumLedgerService.resolveDID(did)
 
