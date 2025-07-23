@@ -2,7 +2,7 @@
   "name": "@ayanworks/credo-ethr-module",
   "main": "build/index",
   "types": "build/index",
-  "version": "0.0.1-alpha",
+  "version": "0.0.1",
   "files": [
     "build"
   ],
@@ -24,7 +24,9 @@
     "check-format": "yarn prettier --check",
     "prettier": "prettier --ignore-path .gitignore '**/*.+(js|json|ts|md|yml|yaml)'",
     "test": "jest",
-    "lint": "eslint --ignore-path .gitignore ."
+    "lint": "eslint --ignore-path .gitignore .",
+    "release": "yarn build && yarn changeset publish --no-git-tag",
+    "changeset-version": "yarn changeset version && yarn prettier --write"
   },
   "dependencies": {
     "@credo-ts/askar": "0.5.3",
@@ -37,6 +39,7 @@
     "keccak256": "^1.0.6"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.5",
     "@credo-ts/node": "0.5.3",
     "@hyperledger/aries-askar-nodejs": "0.2.1",
     "@hyperledger/aries-askar-shared": "0.2.1",
@@ -52,7 +55,6 @@
     "jest": "^29.5.0",
     "prettier": "^2.2.1",
     "reflect-metadata": "^0.2.1",
-    "release-it": "^16.3.0",
     "rimraf": "^4.4.0",
     "rxjs": "^7.8.1",
     "ts-jest": "^29.0.5",
