@@ -31,13 +31,6 @@ export class EthereumModule implements Module {
     // Api
     dependencyManager.registerContextScoped(EthereumApi)
 
-    // // Signature suites.
-    // dependencyManager.registerInstance(SignatureSuiteToken, {
-    //   suiteClass: EcdsaSecp256k1RecoverySignature2020,
-    //   proofType: 'EcdsaSecp256k1RecoverySignature2020',
-    //   verificationMethodTypes: ['EcdsaSecp256k1RecoveryMethod2020'],
-    //   keyTypes: [KeyType.K256],
-    // })
     // Signature suites.
     dependencyManager.registerInstance(SignatureSuiteToken, {
       suiteClass: EcdsaSecp256k1Signature2019,

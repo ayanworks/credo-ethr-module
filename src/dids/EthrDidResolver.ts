@@ -16,9 +16,6 @@ export class EthereumDidResolver implements DidResolver {
   public async resolve(agentContext: AgentContext, did: string): Promise<DidResolutionResult> {
     const ethereumLedgerService = agentContext.dependencyManager.resolve(EthereumLedgerService)
     const didDocumentMetadata = {}
-    // if (!isValidEthereumDid(did)) {
-    //   throw new Error('Invalid DID')
-    // }
     try {
       const { didDocument, didDocumentMetadata, didResolutionMetadata } = await ethereumLedgerService.resolveDID(did)
 

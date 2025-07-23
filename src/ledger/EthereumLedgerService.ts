@@ -1,4 +1,4 @@
-import type { AgentContext, DidDocument, Wallet } from '@credo-ts/core'
+import type { AgentContext, Wallet } from '@credo-ts/core'
 
 import { AskarProfileWallet, AskarWallet } from '@credo-ts/askar'
 import { CredoError, DidRepository, TypedArrayEncoder, WalletError, injectable } from '@credo-ts/core'
@@ -9,49 +9,6 @@ import { getResolver } from 'ethr-did-resolver'
 import { EthereumModuleConfig } from '../EthereumModuleConfig'
 import { EthrSchema } from '../schema/schemaManager'
 import { getPreferredKey } from '../utils/utils'
-
-export type CreateDidOperationOptions = {
-  operation: DidOperation.Create
-  serviceEndpoint?: string
-}
-
-export type UpdateDidOperationOptions = {
-  operation: DidOperation.Update
-  didDocument: DidDocument
-  did: string
-}
-
-export type DeactivateDidOperationOptions = {
-  operation: DidOperation.Deactivate
-  did: string
-}
-
-export type AddResourceDidOperationOptions = {
-  operation: DidOperation.AddResource
-  resourceId: string
-  resource: object
-  did: string
-}
-
-export enum DidOperation {
-  Create = 'createDID',
-  Update = 'updateDIDDoc',
-  Deactivate = 'deactivate',
-  AddResource = 'addResource',
-}
-
-export type DidOperationOptions =
-  | CreateDidOperationOptions
-  | UpdateDidOperationOptions
-  | DeactivateDidOperationOptions
-  | AddResourceDidOperationOptions
-
-export type SchemaOperationOptions = CreateSchemaOperationOptions
-
-export type CreateSchemaOperationOptions = {
-  operation: SchemaOperation.CreateSchema
-  did: string
-}
 
 export enum SchemaOperation {
   CreateSchema = 'createSchema',
@@ -119,60 +76,6 @@ export class EthereumLedgerService {
     agentContext.config.logger.info(`Got schema from ledger: ${did} and schemaId: ${schemaId}`)
     return response
   }
-
-  // public async estimateFeeForDidOperation(agentContext: AgentContext, options: DidOperationOptions) {
-  //   const keyPair = await generateSecp256k1KeyPair()
-
-  //   const didRegistry = this.createDidRegistryInstance(new SigningKey(keyPair.privateKey))
-
-  //   const { operation } = options
-
-  //   if (operation === DidOperation.Create) {
-  //     agentContext.config.logger.info(`Getting estimated fee for operation: ${operation} `)
-  //     const did = `did:ethereum:testnet${keyPair.address}`
-  //     const didDoc = getSecp256k1DidDocWithPublicKey(did, keyPair.publicKeyBase58, options?.serviceEndpoint)
-
-  //     const response = await didRegistry.estimateTxFee(DidOperation.Create, [keyPair.address, JSON.stringify(didDoc)])
-  //     return response
-  //   }
-
-  //   if (operation === DidOperation.Update) {
-  //     agentContext.config.logger.info(`Getting estimated fee for operation: ${operation} `)
-  //     const parsedDid = parseDid(options.did)
-
-  //     const response = await didRegistry.estimateTxFee(
-  //       DidOperation.Update,
-  //       [parsedDid.didAddress, JSON.stringify(options.didDocument)],
-  //       parsedDid.didAddress
-  //     )
-  //     return response
-  //   }
-
-  //   if (operation === DidOperation.Deactivate) {
-  //     agentContext.config.logger.info(`Getting estimated fee for operation: ${operation} `)
-  //     const parsedDid = parseDid(options.did)
-  //     const deactivatedDidDocument = new DidDocumentBuilder(options.did)
-  //       .addContext('https://www.w3.org/ns/did/v1')
-  //       .build()
-  //     const response = await didRegistry.estimateTxFee(
-  //       DidOperation.Update,
-  //       [parsedDid.didAddress, JSON.stringify(deactivatedDidDocument)],
-  //       parsedDid.didAddress
-  //     )
-  //     return response
-  //   }
-
-  //   if (operation === DidOperation.AddResource) {
-  //     agentContext.config.logger.info(`Getting estimated fee for operation: ${operation} `)
-  //     const parsedDid = parseDid(options.did)
-  //     const response = await didRegistry.estimateTxFee(
-  //       DidOperation.AddResource,
-  //       [parsedDid.didAddress, options.resourceId, JSON.stringify(options.resource)],
-  //       parsedDid.didAddress
-  //     )
-  //     return response
-  //   }
-  // }
 
   private createSchemaRegistryInstance(signingKey: SigningKey) {
     if (!this.rpcUrl || !this.schemaManagerContractAddress || !this.fileServerToken || !this.fileServerUrl) {

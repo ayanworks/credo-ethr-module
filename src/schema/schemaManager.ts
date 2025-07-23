@@ -1,4 +1,4 @@
-import type { SigningKey, Network } from 'ethers'
+import type { SigningKey } from 'ethers'
 
 import { utils } from '@credo-ts/core'
 import axios from 'axios'
@@ -8,18 +8,12 @@ import SchemaRegistryAbi from '../abi/SchemaRegistry.json'
 import { buildSchemaResource } from '../utils/schemaHelper'
 import { parseAddress } from '../utils/utils'
 
-export type PolygonDidInitOptions = {
+export type DidInitOptions = {
   rpcUrl: string
   signingKey: SigningKey
   schemaManagerContractAddress: string
   serverUrl: string
   fileServerToken: string
-}
-
-export type PolygonDidRegisterOptions = {
-  did: string
-  publicKeyBase58: string
-  serviceEndpoint?: string
 }
 
 export type ResourcePayload = {
@@ -35,17 +29,6 @@ export type ResourcePayload = {
   nextVersionId: string | null
 }
 
-export type EstimatedTxDetails = {
-  transactionFee: string
-  gasLimit: string
-  gasPrice: string
-  maxFeePerGas: number
-  maxPriorityFeePerGas: number
-  network: string
-  chainId: string
-  method: string
-}
-
 export class EthrSchema {
   private schemaRegistry: Contract
   private fileServerUrl: string
@@ -53,13 +36,7 @@ export class EthrSchema {
   private schemaManagerContractAddress: string
   private rpcUrl: string
 
-  public constructor({
-    schemaManagerContractAddress,
-    rpcUrl,
-    serverUrl,
-    fileServerToken,
-    signingKey,
-  }: PolygonDidInitOptions) {
+  public constructor({ schemaManagerContractAddress, rpcUrl, serverUrl, fileServerToken, signingKey }: DidInitOptions) {
     this.schemaManagerContractAddress = schemaManagerContractAddress
     this.rpcUrl = rpcUrl
     const provider = new JsonRpcProvider(rpcUrl)
@@ -100,23 +77,12 @@ export class EthrSchema {
       if (!uploadSchemaDetails) {
         throw new Error(`Error while uploading schema on file server!`)
       }
-      // const addedResourcetxnReceipt = await this.didRegistry.addResource(
-      //   parsedDid.didAddress,
-      //   schemaId,
-      //   JSON.stringify(schemaResource)
-      // )
-
-      // if (!addedResourcetxnReceipt.hash) {
-      //   tnxSchemaId = schemaId
-      //   schemaTxhash = schemaTxnReceipt.hash
-      //   throw new Error(`Error while adding schema resource in DID Registry!`)
-      // }
 
       return {
         did,
         schemaId,
         schemaTxnHash: schemaTxnReceipt.hash,
-        // resourceTxnHash: addedResourcetxnReceipt.hash,
+        // resourceTxnHash: addedResourcetxnReceipt.hash, //WIP
       }
     } catch (error) {
       return {
@@ -135,17 +101,9 @@ export class EthrSchema {
       if (!schemaId) {
         throw new Error('Schema id is required!')
       }
-      // const isValidDid = validateDid(did)
-      // if (!isValidDid) {
-      //   throw new Error('invalid did provided')
-      // }
 
       address = parseAddress(address)
 
-      // const didDetails = await this.resolver.resolve(did)
-      // if (!didDetails.didDocument) {
-      //   throw new Error(The DID document for the given DID was not found!)
-      // }
       const schemaDetails = await this.schemaRegistry.getSchemaById(address, schemaId)
       if (!schemaDetails) {
         throw new Error('Error while fetching schema details by schema id!')
@@ -155,28 +113,6 @@ export class EthrSchema {
       throw new Error(`Error occurred in getSchemaById function ${error}`)
     }
   }
-
-  // public async getAllSchemaByDID(did: string) {
-  //   try {
-  //     // const isValidDid = validateDid(did)
-  //     // if (!isValidDid) {
-  //     //   throw new Error('invalid did provided')
-  //     // }
-  //     // const didDetails = await this.resolver.resolve(did)
-
-  //     if (!didDetails?.didDocumentMetadata?.linkedResourceMetadata) {
-  //       return []
-  //     }
-  //     const linkedResourceMetadata = didDetails?.didDocumentMetadata?.linkedResourceMetadata
-  //     const schemaList: ResourcePayload[] = linkedResourceMetadata.filter(
-  //       (element: ResourcePayload) => element.resourceType === 'W3C-schema'
-  //     )
-  //     return schemaList
-  //   } catch (error) {
-  //     console.log(`Error occurred in getAllSchemaByDID function ${error} `)
-  //     throw error
-  //   }
-  // }
 
   private async uploadSchemaFile(schemaResourceId: string, schema: object) {
     try {
@@ -203,93 +139,6 @@ export class EthrSchema {
     } catch (error) {
       throw new Error(`Error occurred in uploadSchemaFile function ${error} `)
       throw error
-    }
-  }
-
-  public async estimateTxFee(method: string, argument?: string[]): Promise<EstimatedTxDetails | null> {
-    try {
-      if (!method) {
-        throw new Error(`Method is required for estimate transaction!`)
-      }
-      const provider = new JsonRpcProvider(this.rpcUrl)
-      const contract = new Contract(this.schemaManagerContractAddress, SchemaRegistryAbi, provider)
-
-      // Encode function data
-      const encodedFunction = await contract.interface.encodeFunctionData(method, argument)
-
-      // Check if encodedFunction is null or empty
-      if (!encodedFunction) {
-        throw new Error('Error while getting encoded function details')
-      }
-
-      // Estimate gas limit
-      const gasLimit = await provider.estimateGas({
-        to: this.schemaManagerContractAddress,
-        data: encodedFunction,
-      })
-
-      // Convert gas limit to Gwei
-      const gasLimitGwei = parseFloat(String(gasLimit)) / 1e9
-
-      // Get gas price details
-      const gasPriceDetails = await provider.getFeeData()
-
-      // Check if gas price details are available
-      if (!gasPriceDetails || !gasPriceDetails.gasPrice) {
-        throw new Error('Gas price details not found!')
-      }
-
-      // Convert gas price to Gwei
-      const gasPriceGwei = parseFloat(String(gasPriceDetails.gasPrice)) / 1e9
-
-      // Get network details
-      const networkDetails: Network = await provider.getNetwork()
-
-      // Check if network details are available
-      if (!networkDetails) {
-        throw new Error('Network details not found!')
-      }
-      const maxGasFee = parseFloat(String(gasPriceDetails.maxFeePerGas)) / 1e9
-
-      // Calculate transaction fee
-      const transactionFee = gasLimitGwei * maxGasFee
-
-      // Create EstimatedTxDetails object
-      const estimatedTxDetails: EstimatedTxDetails = {
-        transactionFee: String(transactionFee),
-        gasLimit: String(gasLimitGwei),
-        gasPrice: String(gasPriceGwei),
-        maxFeePerGas: maxGasFee,
-        maxPriorityFeePerGas: parseFloat(String(gasPriceDetails.maxPriorityFeePerGas)) / 1e9,
-        network: String(networkDetails.name),
-        chainId: String(networkDetails.chainId),
-        method,
-      }
-
-      return estimatedTxDetails
-    } catch (error) {
-      throw new Error(`Error calculating transaction fee: ${error}`)
-    }
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async validateSchemaObject(json: Record<string, any>) {
-    try {
-      if (typeof json !== 'object' || json === null) {
-        throw new Error('Schema object is not a valid JSON!')
-      }
-      // Check if @context exists and is an object
-      if (
-        !('@context' in json) || // Check if '@context' property exists
-        (typeof json['@context'] !== 'object' && !Array.isArray(json['@context'])) || // Check if '@context' is neither an object nor an array
-        json['@context'] === null // Check if '@context' is null
-      ) {
-        throw new Error('Invalid schema context!')
-      }
-
-      return true
-    } catch (error) {
-      throw new Error(`Error validating schema JSON: ${error}`)
     }
   }
 }
