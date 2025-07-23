@@ -89,7 +89,7 @@ jobs:
           EOF
 
           yarn changeset version --snapshot alpha
-          yarn style:fix
+          yarn prettier --write .
           yarn build
           yarn changeset publish --tag alpha
 
