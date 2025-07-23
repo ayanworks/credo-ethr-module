@@ -52,8 +52,6 @@ export class EthrSchema {
     }
 
     let schemaId
-    const tnxSchemaId = ''
-    const schemaTxhash: string = ''
     address = parseAddress(address)
 
     if (!this.accessToken) {
@@ -86,8 +84,6 @@ export class EthrSchema {
       }
     } catch (error) {
       return {
-        tnxSchemaId,
-        schemaTxhash,
         schemaState: {
           state: 'failed',
           reason: `unknownError: ${error}`,
@@ -138,7 +134,6 @@ export class EthrSchema {
       return response
     } catch (error) {
       throw new Error(`Error occurred in uploadSchemaFile function ${error} `)
-      throw error
     }
   }
 }
