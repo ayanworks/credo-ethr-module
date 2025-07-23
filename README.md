@@ -1,6 +1,6 @@
-# Credo did:ethereum W3C Module
+# Credo did:ethr Module
 
-- W3C did:ethereum method registry for [credo-ts](https://github.com/openwallet-foundation/credo-ts).
+- did:ethr method registry for [credo-ts](https://github.com/openwallet-foundation/credo-ts).
 
 ## Usage
 
